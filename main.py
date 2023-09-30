@@ -1,7 +1,7 @@
 # All code written by Andrew Roddy
 
 
-def ascii_art():
+def ascii_art() -> str:
     """Generates Ascii Art for the program
 
     Returns:
@@ -10,7 +10,7 @@ def ascii_art():
     return "\n   ____                            _     _  _\n  / ___|___  _ __  _ __   ___  ___| |_  | || |\n | |   / _ \| '_ \| '_ \ / _ \/ __| __| | || |_\n | |__| (_) | | | | | | |  __/ (__| |_  |__   _|\n  \____\___/|_| |_|_| |_|\___|\___|\__|    |_|\nUse -1 to forfeit."
 
 
-def empty_board():
+def empty_board() -> list:
     """Generates an empty Connect 4 board.
 
     Returns:
@@ -33,7 +33,7 @@ def display_board(board: list) -> None:
         board (list): Prints the board to the terminal.
     """
     print("1 2 3 4 5 6 7")
-    for i in range(len(board)):
+    for i in range(len(board)):  # Runs once for every row in the board
         print(*board[i], sep=" ")
 
     print("1 2 3 4 5 6 7")
@@ -50,10 +50,10 @@ def player_turn(board: list, column: int, player: str) -> list:
     Returns:
         list: The updated Connect 4 board.
     """
-    column -= 1
+    column -= 1  # Changes from a visual column to a list column
 
     for i in range(len(board) - 1, -1, -1):
-        if board[i][column] == "_":
+        if board[i][column] == "_":  # Checks if the column is empty
             board[i][column] = player
             return board
 
@@ -71,7 +71,7 @@ def check_turn(board: list, column: int) -> bool:
     if column > 7 or column < 0:
         return False
 
-    if board[0][column - 1] != "_":
+    if board[0][column - 1] != "_":  # Checks if the column is full
         return False
 
     return True
@@ -200,15 +200,16 @@ def check_full(board: list) -> bool:
 
 
 def main():
-    print(ascii_art())
-    board = empty_board()
-    player = "X"
+    print(ascii_art())  # Prints the art
+    board = empty_board()  # Instalizes an empty board
+    player = "X"  # Sets the first player to X
+
     while True:
         print("\n")
-        display_board(board)
+        display_board(board)  # Prints the current board
         try:
             column = int(input(f"What column {player}? "))
-            if column == -1:
+            if column == -1:  # If the user enters -1, they forfeit
                 break
 
         except ValueError:
@@ -223,21 +224,20 @@ def main():
 
         board = player_turn(board, column, player)
 
-        if check_win(board, player):
+        if check_win(board, player):  # Checks if the player has won
             display_board(board)
             print(f"{player} Wins!\n")
             break
 
-        if check_full(board):
+        if check_full(board):  # Checks if the game ends in a tie
             display_board(board)
             print("Tie!")
             break
-        
-        if player == "X":
+
+        if player == "X":  # Switches the player
             player = "O"
         else:
             player = "X"
-            
 
     print("Thanks for playing!")
     rematch = input("Play Again? ")
