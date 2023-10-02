@@ -4,23 +4,23 @@ import random
 
 
 class Connect4:
-    
-    def __init__(self):
-        self.board = [
+    def empty_board(self) -> list:
+        """Generates an empty Connect 4 board.
+
+        Returns:
+            list: A 2d list of the empty Connect 4 board.
+        """
+        return [
             ["_", "_", "_", "_", "_", "_", "_"],
             ["_", "_", "_", "_", "_", "_", "_"],
             ["_", "_", "_", "_", "_", "_", "_"],
             ["_", "_", "_", "_", "_", "_", "_"],
             ["_", "_", "_", "_", "_", "_", "_"],
             ["_", "_", "_", "_", "_", "_", "_"],
-        ]  # Instalizes an empty board
-        self.player = "".join(random.choices(["X", "O"]))
-        self.game_running = True
-        self.winner = ""
-        self.mode = "pvp"
-        
-    def check_full(self) -> bool:
-        """Checks if the self.players have filled the board and tied.
+        ]
+
+    def check_full(self, board: list) -> bool:
+        """Checks if the players have filled the board and tied.
 
         Args:
             board (list): The current Connect 4 board.
@@ -28,13 +28,13 @@ class Connect4:
         Returns:
             bool: True if the board is full, False if the board is not full.
         """
-        for i in range(len(self.board)):
-            for j in range(len(self.board[i])):
-                if self.board[i][j] == "_":
+        for i in range(len(board)):
+            for j in range(len(board[i])):
+                if board[i][j] == "_":
                     return False
         return True
 
-    def check_win_horizontal(self,) -> bool:
+    def check_win_horizontal(self, board: list, player: str) -> bool:
         """Checks if the current user has won the game horizontally.
 
         Args:
@@ -44,18 +44,18 @@ class Connect4:
         Returns:
             bool: True if the player has won, False if the player has not won.
         """
-        for x in range(len(self.board[0]) - 3):
-            for y in range(len(self.board)):
+        for x in range(len(board[0]) - 3):
+            for y in range(len(board)):
                 if (
-                    self.board[y][x] == self.player
-                    and self.board[y][x + 1] == self.player
-                    and self.board[y][x + 2] == self.player
-                    and self.board[y][x + 3] == self.player
+                    board[y][x] == player
+                    and board[y][x + 1] == player
+                    and board[y][x + 2] == player
+                    and board[y][x + 3] == player
                 ):
                     return True
         return False
 
-    def check_win_vertical(self) -> bool:
+    def check_win_vertical(self, board: list, player: str) -> bool:
         """Checks if the current user has won the game vertically.
 
         Args:
@@ -65,18 +65,18 @@ class Connect4:
         Returns:
             bool: True if the player has won, False if the player has not won.
         """
-        for y in range(len(self.board[0]) - 4):
-            for x in range(len(self.board)):
+        for y in range(len(board[0]) - 4):
+            for x in range(len(board)):
                 if (
-                    self.board[y][x] == self.player
-                    and self.board[y + 1][x] == self.player
-                    and self.board[y + 2][x] == self.player
-                    and self.board[y + 3][x] == self.player
+                    board[y][x] == player
+                    and board[y + 1][x] == player
+                    and board[y + 2][x] == player
+                    and board[y + 3][x] == player
                 ):
                     return True
         return False
 
-    def check_win_diagnol(self) -> bool:
+    def check_win_diagnol(self, board: list, player: str) -> bool:
         """Checks if the current user has won the game diagnoly.
 
         Args:
@@ -86,18 +86,18 @@ class Connect4:
         Returns:
             bool: True if the player has won, False if the player has not won.
         """
-        for y in range(len(self.board[0]) - 4):
-            for x in range(len(self.board) - 2):
+        for y in range(len(board[0]) - 4):
+            for x in range(len(board) - 2):
                 if (
-                    self.board[y + 3][x] == self.player
-                    and self.board[y + 2][x + 1] == self.player
-                    and self.board[y + 1][x + 2] == self.player
-                    and self.board[y][x + 3] == self.player
+                    board[y + 3][x] == player
+                    and board[y + 2][x + 1] == player
+                    and board[y + 1][x + 2] == player
+                    and board[y][x + 3] == player
                 ):
                     return True
         return False
 
-    def player_turn(self, column: int) -> list:
+    def player_turn(self, board: list, column: int, player: str) -> list:
         """Allows the player to place an icon on the board.
 
         Args:
@@ -110,12 +110,12 @@ class Connect4:
         """
         column -= 1  # Changes from a visual column to a list column
 
-        for i in range(len(self.board) - 1, -1, -1):
-            if self.board[i][column] == "_":  # Checks if the column is empty
-                self.board[i][column] = self.player
-                return self.board
+        for i in range(len(board) - 1, -1, -1):
+            if board[i][column] == "_":  # Checks if the column is empty
+                board[i][column] = player
+                return board
 
-    def check_turn(self, column: int) -> bool:
+    def check_turn(self, board: list, column: int) -> bool:
         """Checks if the player's turn is valid.
 
         Args:
@@ -128,12 +128,12 @@ class Connect4:
         if column > 7 or column < 0:
             return False
 
-        if self.board[0][column - 1] != "_":  # Checks if the column is full
+        if board[0][column - 1] != "_":  # Checks if the column is full
             return False
 
         return True
 
-    def check_win_reverse_diagnol(self) -> bool:
+    def check_win_reverse_diagnol(self, board: list, player: str) -> bool:
         """Checks if the current user has won the game in a reverse diagnol.
 
         Args:
@@ -143,18 +143,18 @@ class Connect4:
         Returns:
             bool: True if the player has won, False if the player has not won.
         """
-        for y in range(len(self.board[0]) - 4):
-            for x in range(len(self.board) - 2):
+        for y in range(len(board[0]) - 4):
+            for x in range(len(board) - 2):
                 if (
-                    self.board[y][x] == self.player
-                    and self.board[y + 1][x + 1] == self.player
-                    and self.board[y + 2][x + 2] == self.player
-                    and self.board[y + 3][x + 3] == self.player
+                    board[y][x] == player
+                    and board[y + 1][x + 1] == player
+                    and board[y + 2][x + 2] == player
+                    and board[y + 3][x + 3] == player
                 ):
                     return True
         return False
 
-    def check_win(self) -> bool:
+    def check_win(self, board: list, player: str) -> bool:
         """Runs the 4 win checking functions and returns True if any of them return True.
 
         Args:
@@ -165,33 +165,33 @@ class Connect4:
             bool: True if the player has won.
         """
         return (
-            self.check_win_horizontal(self.player)
-            or self.check_win_vertical(self.player)
-            or self.check_win_reverse_diagnol(self.player)
-            or self.check_win_diagnol(self.player)
+            self.check_win_horizontal(board, player)
+            or self.check_win_vertical(board, player)
+            or self.check_win_reverse_diagnol(board, player)
+            or self.check_win_diagnol(board, player)
         )
 
-    def draw_board(self, screen, image) -> None:
-        for i in range(len(self.board[0])):
-            for j in range(len(self.board)):
-                if self.board[j][i] == "X":
+    def draw_board(self, board: list, screen, image) -> None:
+        for i in range(len(board[0])):
+            for j in range(len(board)):
+                if board[j][i] == "X":
                     screen.blit(
                         image["red_chip"],
                         (((i + 0.5) * 70) - 25, ((j + 1.5) * 70) - 25),
                     )
-                if self.board[j][i] == "O":
+                if board[j][i] == "O":
                     screen.blit(
                         image["blue_chip"],
                         (((i + 0.5) * 70) - 25, ((j + 1.5) * 70) - 25),
                     )
-                if self.board[j][i] == "_":
+                if board[j][i] == "_":
                     pygame.draw.circle(
                         screen, "gray", ((i + 0.5) * 70, (j + 1.5) * 70), 20
                     )
 
         return screen
 
-    def colum_select(self, running, mode="pvp"):
+    def colum_select(self, board, player, winner, game_running, running, mode="pvp"):
         # If a key is pressed then runs everything else
         keys = [
             pygame.K_1,
@@ -202,48 +202,50 @@ class Connect4:
             pygame.K_6,
             pygame.K_7,
         ]
-        if mode == "pvp" or self.player == "X":
+        if mode == "pvp" or player == "X":
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and self.game_running:
+                if event.type == pygame.KEYDOWN and game_running:
                     for i in range(len(keys)):
-                        if event.key == keys[i] and self.check_turn( (i + 1)):
-                            self.player_turn((i + 1))
+                        if event.key == keys[i] and self.check_turn(board, (i + 1)):
+                            self.player_turn(board, (i + 1), player)
 
-                            if self.check_win():  # Checks if the player has won
-                                self.winner = self.player
-                                self.game_running = False
+                            if self.check_win(
+                                board, player
+                            ):  # Checks if the player has won
+                                winner = player
+                                game_running = False
 
                             if self.check_full(
-                                
+                                board
                             ):  # Checks if the game ends in a tie
-                                self.game_running = False
-                                self.winner = "Z"
+                                game_running = False
+                                winner = "Z"
 
-                            if self.player == "X":  # Switches the player
-                                self.player = "O"
+                            if player == "X":  # Switches the player
+                                player = "O"
                             else:
-                                self.player = "X"
+                                player = "X"
                 if event.type == pygame.QUIT:
                     running = False
-        if mode == "random" and self.player == "O":
+        if mode == "random" and player == "O":
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
             while True:
                 pick = random.randint(1, 7)
-                if self.check_turn(pick):
-                    self.player_turn(pick)
-                    if self.check_win():  # Checks if the player has won
-                        self.winner = self.player
-                        self.game_running = False
+                if self.check_turn(board, pick):
+                    self.player_turn(board, pick, player)
+                    if self.check_win(board, player):  # Checks if the player has won
+                        winner = player
+                        game_running = False
 
-                    if self.check_full():  # Checks if the game ends in a tie
-                        self.game_running = False
-                        self.winner = "Z"
-                    self.player = "X"
+                    if self.check_full(board):  # Checks if the game ends in a tie
+                        game_running = False
+                        winner = "Z"
+                    player = "X"
                     break
 
-        return running
+        return board, player, winner, game_running, running
 
     def generate_text(self):
         # Instalizes all Text
@@ -300,7 +302,12 @@ class Connect4:
         # Using blit to copy content from one surface to other
         return image
 
-
+    def restart_game(self):
+        board = self.empty_board()  # Instalizes an empty board
+        player = "".join(random.choices(["X", "O"]))  # Sets the first player to random
+        game_running = True
+        winner = ""
+        return board, player, game_running, winner
 
     def main_menu(self, screen, text, image):
         for event in pygame.event.get():
@@ -313,17 +320,17 @@ class Connect4:
         screen.blit(text["menu"], (10, 450))
         return True, screen
 
-    def game_over(self, screen, text):
+    def game_over(self, screen, text, winner):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     return True, screen
 
-        if self.winner == "X":
+        if winner == "X":
             self.draw_text(screen, text, "x_wins")
-        if self.winner == "O":
+        if winner == "O":
             self.draw_text(screen, text, "o_wins")
-        if self.winner == "Z":
+        if winner == "Z":
             self.draw_text(screen, text, "game_tie")
         return (
             False,
@@ -344,6 +351,7 @@ def main():
     text = game.generate_text()
     image = game.generate_image()
 
+    board, player, game_running, winner = game.restart_game()
     mode = "pvp"
     # While the game is running
 
@@ -352,22 +360,24 @@ def main():
         if menu == True:
             menu, screen = game.main_menu(screen, text, image)
 
-        elif game.game_running == False:
-            screen = game.game_over(screen, text)
-            if game.game_running == True:
-                game  = game.restart_game()
+        elif game_running == False:
+            game_running, screen = game.game_over(screen, text, winner)
+            if game_running == True:
+                board, player, game_running, winner = game.restart_game()
         else:
             # Draw from back to front
             screen.fill("aliceblue")
 
-            running = game.colum_select(running, mode)
+            board, player, winner, game_running, running = game.colum_select(
+                board, player, winner, game_running, running, mode
+            )
 
             # Draws the pieces on the board
-            screen = game.draw_board( screen, image)
+            screen = game.draw_board(board, screen, image)
             screen = game.draw_text(screen, text, "numbers")
-            if game.player == "X" and game_running:
+            if player == "X" and game_running:
                 screen = game.draw_text(screen, text, "x_text")
-            if game.player == "O" and game_running:
+            if player == "O" and game_running:
                 screen = game.draw_text(screen, text, "o_text")
 
         for event in pygame.event.get():
