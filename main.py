@@ -4,7 +4,6 @@ import random
 
 
 class Connect4:
-    
     def __init__(self):
         self.board = [
             ["_", "_", "_", "_", "_", "_", "_"],
@@ -18,7 +17,7 @@ class Connect4:
         self.game_running = True
         self.winner = ""
         self.mode = "pvp"
-        
+
     def check_full(self) -> bool:
         """Checks if the self.players have filled the board and tied.
 
@@ -34,7 +33,8 @@ class Connect4:
                     return False
         return True
 
-    def check_win_horizontal(self,) -> bool:
+    # Win Checks
+    def check_win_horizontal(self) -> bool:
         """Checks if the current user has won the game horizontally.
 
         Args:
@@ -97,6 +97,44 @@ class Connect4:
                     return True
         return False
 
+    def check_win_reverse_diagnol(self) -> bool:
+        """Checks if the current user has won the game in a reverse diagnol.
+
+        Args:
+            board (list): The current Connect 4 board.
+            player (str): The current player's icon.
+
+        Returns:
+            bool: True if the player has won, False if the player has not won.
+        """
+        for y in range(len(self.board[0]) - 4):
+            for x in range(len(self.board) - 2):
+                if (
+                    self.board[y][x] == self.player
+                    and self.board[y + 1][x + 1] == self.player
+                    and self.board[y + 2][x + 2] == self.player
+                    and self.board[y + 3][x + 3] == self.player
+                ):
+                    return True
+        return False
+
+    def check_win(self) -> bool:
+        """Runs the 4 win checking functions and returns True if any of them return True.
+
+        Args:
+            board (list): The current Connect 4 board.
+            player (str): The current player's icon.
+
+        Returns:
+            bool: True if the player has won.
+        """
+        return (
+            self.check_win_horizontal()
+            or self.check_win_vertical()
+            or self.check_win_reverse_diagnol()
+            or self.check_win_diagnol()
+        )
+
     def player_turn(self, column: int) -> list:
         """Allows the player to place an icon on the board.
 
@@ -133,44 +171,6 @@ class Connect4:
 
         return True
 
-    def check_win_reverse_diagnol(self) -> bool:
-        """Checks if the current user has won the game in a reverse diagnol.
-
-        Args:
-            board (list): The current Connect 4 board.
-            player (str): The current player's icon.
-
-        Returns:
-            bool: True if the player has won, False if the player has not won.
-        """
-        for y in range(len(self.board[0]) - 4):
-            for x in range(len(self.board) - 2):
-                if (
-                    self.board[y][x] == self.player
-                    and self.board[y + 1][x + 1] == self.player
-                    and self.board[y + 2][x + 2] == self.player
-                    and self.board[y + 3][x + 3] == self.player
-                ):
-                    return True
-        return False
-
-    def check_win(self) -> bool:
-        """Runs the 4 win checking functions and returns True if any of them return True.
-
-        Args:
-            board (list): The current Connect 4 board.
-            player (str): The current player's icon.
-
-        Returns:
-            bool: True if the player has won.
-        """
-        return (
-            self.check_win_horizontal(self.player)
-            or self.check_win_vertical(self.player)
-            or self.check_win_reverse_diagnol(self.player)
-            or self.check_win_diagnol(self.player)
-        )
-
     def draw_board(self, screen, image) -> None:
         for i in range(len(self.board[0])):
             for j in range(len(self.board)):
@@ -206,16 +206,14 @@ class Connect4:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and self.game_running:
                     for i in range(len(keys)):
-                        if event.key == keys[i] and self.check_turn( (i + 1)):
+                        if event.key == keys[i] and self.check_turn((i + 1)):
                             self.player_turn((i + 1))
 
                             if self.check_win():  # Checks if the player has won
                                 self.winner = self.player
                                 self.game_running = False
 
-                            if self.check_full(
-                                
-                            ):  # Checks if the game ends in a tie
+                            if self.check_full():  # Checks if the game ends in a tie
                                 self.game_running = False
                                 self.winner = "Z"
 
@@ -300,8 +298,6 @@ class Connect4:
         # Using blit to copy content from one surface to other
         return image
 
-
-
     def main_menu(self, screen, text, image):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -353,9 +349,9 @@ def main():
             menu, screen = game.main_menu(screen, text, image)
 
         elif game.game_running == False:
-            screen = game.game_over(screen, text)
+            game.game_running, screen = game.game_over(screen, text)
             if game.game_running == True:
-                game  = game.restart_game()
+                game = Connect4()
         else:
             # Draw from back to front
             screen.fill("aliceblue")
@@ -363,11 +359,11 @@ def main():
             running = game.colum_select(running, mode)
 
             # Draws the pieces on the board
-            screen = game.draw_board( screen, image)
+            screen = game.draw_board(screen, image)
             screen = game.draw_text(screen, text, "numbers")
-            if game.player == "X" and game_running:
+            if game.player == "X" and game.game_running:
                 screen = game.draw_text(screen, text, "x_text")
-            if game.player == "O" and game_running:
+            if game.player == "O" and game.game_running:
                 screen = game.draw_text(screen, text, "o_text")
 
         for event in pygame.event.get():
