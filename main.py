@@ -17,6 +17,16 @@ class Connect4:
         self.game_running = True
         self.winner = ""
         self.mode = "pvp"
+        self.running = True
+        self.size = 1000
+
+    def resize(self, screen):
+        self.screen_x, self.screen_y = screen.get_size()
+        if self.screen_x > self.screen_y:
+            self.size = self.screen_y
+        else:
+            self.size = self.screen_x
+        
 
     def check_full(self) -> bool:
         """Checks if the self.players have filled the board and tied.
@@ -151,7 +161,20 @@ class Connect4:
         for i in range(len(self.board) - 1, -1, -1):
             if self.board[i][column] == "_":  # Checks if the column is empty
                 self.board[i][column] = self.player
-                return self.board
+                break
+
+        if self.check_win():  # Checks if the player has won
+            self.winner = self.player
+            self.game_running = False
+
+        if self.check_full():  # Checks if the game ends in a tie
+            self.game_running = False
+            self.winner = "Z"
+
+        if self.player == "X":  # Switches the player
+            self.player = "O"
+        else:
+            self.player = "X"
 
     def check_turn(self, column: int) -> bool:
         """Checks if the player's turn is valid.
@@ -172,26 +195,40 @@ class Connect4:
         return True
 
     def draw_board(self, screen, image) -> None:
+        icons = [image["red_chip"], image["blue_chip"]]
+        players = ["X", "O"]
+        
+        image["red_chip"] = pygame.transform.scale(image["red_chip"], (self.size * 0.9, self.size * 0.8))
+        rect = image["red_chip"].get_rect(center=(self.screen_x/2, self.screen_y/4))
+        screen.blit(image["red_chip"], rect)
+
+        image["red_chip"] = pygame.transform.scale(image["red_chip"], (self.size/10, self.size/10))
+    
         for i in range(len(self.board[0])):
             for j in range(len(self.board)):
-                if self.board[j][i] == "X":
-                    screen.blit(
-                        image["red_chip"],
-                        (((i + 0.5) * 70) - 25, ((j + 1.5) * 70) - 25),
-                    )
-                if self.board[j][i] == "O":
-                    screen.blit(
-                        image["blue_chip"],
-                        (((i + 0.5) * 70) - 25, ((j + 1.5) * 70) - 25),
-                    )
-                if self.board[j][i] == "_":
-                    pygame.draw.circle(
-                        screen, "gray", ((i + 0.5) * 70, (j + 1.5) * 70), 20
-                    )
+                for k in range(len(icons)):
+                    if self.board[j][i] == players[k]:
+                        """
+                        i is 0 - 6 horizontal
+                        j is 0 - 5 and vertical
+                        for j
+                        ((0 + 500/1000) * (500/7)) - 500 / 20 = 10.7
+                        ((5 + 500/1000) * (500/7)) - 500 / 20 = 367.
+                        
+                        for i
+                        ((6 + 500/1000) * (500/7)) - 500 / 20 = 493.2
+                        """
+                        screen.blit(
+                            icons[k],
+                            ((
 
+                                (((i + self.size / 1500) * (self.size / 6))),
+                                (((j + self.size / 1500) * (self.size / 7)))
+                                ),),
+                        )
         return screen
 
-    def colum_select(self, running, mode="pvp"):
+    def colum_select(self, mode="pvp"):
         # If a key is pressed then runs everything else
         keys = [
             pygame.K_1,
@@ -209,39 +246,17 @@ class Connect4:
                         if event.key == keys[i] and self.check_turn((i + 1)):
                             self.player_turn((i + 1))
 
-                            if self.check_win():  # Checks if the player has won
-                                self.winner = self.player
-                                self.game_running = False
-
-                            if self.check_full():  # Checks if the game ends in a tie
-                                self.game_running = False
-                                self.winner = "Z"
-
-                            if self.player == "X":  # Switches the player
-                                self.player = "O"
-                            else:
-                                self.player = "X"
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
         if mode == "random" and self.player == "O":
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
             while True:
                 pick = random.randint(1, 7)
                 if self.check_turn(pick):
                     self.player_turn(pick)
-                    if self.check_win():  # Checks if the player has won
-                        self.winner = self.player
-                        self.game_running = False
-
-                    if self.check_full():  # Checks if the game ends in a tie
-                        self.game_running = False
-                        self.winner = "Z"
-                    self.player = "X"
                     break
-
-        return running
 
     def generate_text(self):
         # Instalizes all Text
@@ -291,11 +306,7 @@ class Connect4:
             "space_button": pygame.image.load("images\\space_button.png"),
             "logo": pygame.image.load("images\\connect_four_logo.png"),
         }
-        # create a surface object, image is drawn on it.
-        image["blue_chip"] = pygame.transform.scale(image["blue_chip"], (50, 50))
-        image["red_chip"] = pygame.transform.scale(image["red_chip"], (50, 50))
-        image["logo"] = pygame.transform.scale(image["logo"], (450, 400))
-        # Using blit to copy content from one surface to other
+         # Using blit to copy content from one surface to other
         return image
 
     def main_menu(self, screen, text, image):
@@ -303,10 +314,21 @@ class Connect4:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     return False, screen
+            if event.type == pygame.QUIT:
+                self.running = False
         screen.fill("white")
-        screen.blit(image["space_button"], (100, 250))
-        screen.blit(image["logo"], (10, -100))
-        screen.blit(text["menu"], (10, 450))
+        
+        image["space_button"] = pygame.transform.scale(image["space_button"], (self.size * 0.5, self.size * 0.25))
+        rect = image["space_button"].get_rect(center=(self.screen_x/2, self.screen_y * 0.6))
+        screen.blit(image["space_button"], rect)
+        
+        image["logo"] = pygame.transform.scale(image["logo"], (self.size * 0.9, self.size * 0.8))
+        rect = image["logo"].get_rect(center=(self.screen_x/2, self.screen_y/4))
+        screen.blit(image["logo"], rect)
+        
+        rect = text["menu"].get_rect(center=(self.screen_x/2, self.screen_y * 0.8))
+        screen.blit(text["menu"], rect)
+        
         return True, screen
 
     def game_over(self, screen, text):
@@ -314,7 +336,8 @@ class Connect4:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     return True, screen
-
+            if event.type == pygame.QUIT:
+                self.running = False
         if self.winner == "X":
             self.draw_text(screen, text, "x_wins")
         if self.winner == "O":
@@ -330,46 +353,47 @@ class Connect4:
 def main():
     # pygame setup #
     pygame.init()
-    screen = pygame.display.set_mode((500, 500))
+    screen = pygame.display.set_mode((1000, 1000),pygame.RESIZABLE)
     clock = pygame.time.Clock()
-    running = True
     pygame.display.set_caption("Connect 4            -Andrew Roddy")
+    
     ################
 
-    game = Connect4()
-    text = game.generate_text()
-    image = game.generate_image()
+    g = Connect4()
+    text = g.generate_text()
+    image = g.generate_image()
 
     mode = "pvp"
     # While the game is running
 
     menu = True
-    while running:
+    while g.running:
+        g.resize(screen)
         if menu == True:
-            menu, screen = game.main_menu(screen, text, image)
+            menu, screen = g.main_menu(screen, text, image)
 
-        elif game.game_running == False:
-            game.game_running, screen = game.game_over(screen, text)
-            if game.game_running == True:
-                game = Connect4()
+        elif g.game_running == False:
+            g.game_running, screen = g.game_over(screen, text)
+            if g.game_running == True:
+                g = Connect4()
         else:
             # Draw from back to front
             screen.fill("aliceblue")
 
-            running = game.colum_select(running, mode)
+            g.colum_select(mode)
 
             # Draws the pieces on the board
-            screen = game.draw_board(screen, image)
-            screen = game.draw_text(screen, text, "numbers")
-            if game.player == "X" and game.game_running:
-                screen = game.draw_text(screen, text, "x_text")
-            if game.player == "O" and game.game_running:
-                screen = game.draw_text(screen, text, "o_text")
+            screen = g.draw_board(screen, image)
+            screen = g.draw_text(screen, text, "numbers")
+            if g.player == "X" and g.game_running:
+                screen = g.draw_text(screen, text, "x_text")
+            if g.player == "O" and g.game_running:
+                screen = g.draw_text(screen, text, "o_text")
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.type == pygame.QUIT:
-                    running = False
+                    g.running = False
             # Runs pygame
         pygame.display.flip()  # displays to screen
         clock.tick(60)  # limits FPS to 60
