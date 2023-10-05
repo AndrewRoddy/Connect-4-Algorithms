@@ -18,7 +18,7 @@ class Connect4:
         self.winner = ""
         self.mode = "pvp"
         self.running = True
-        self.size = 1000
+        self.size = 500
 
     def resize(self, screen):
         self.screen_x, self.screen_y = screen.get_size()
@@ -301,10 +301,10 @@ class Connect4:
 
     def generate_image(self):
         image = {
-            "blue_chip": pygame.image.load("images\\blue_chip.png"),
-            "red_chip": pygame.image.load("images\\red_chip.png"),
-            "space_button": pygame.image.load("images\\space_button.png"),
-            "logo": pygame.image.load("images\\connect_four_logo.png"),
+            "blue_chip": pygame.image.load("images\\blue.png"),
+            "red_chip": pygame.image.load("images\\red.png"),
+            "space_button": pygame.image.load("images\\space.png"),
+            "logo": pygame.image.load("images\\logo.png"),
         }
          # Using blit to copy content from one surface to other
         return image
@@ -322,7 +322,7 @@ class Connect4:
         rect = image["space_button"].get_rect(center=(self.screen_x/2, self.screen_y * 0.6))
         screen.blit(image["space_button"], rect)
         
-        image["logo"] = pygame.transform.scale(image["logo"], (self.size * 0.9, self.size * 0.8))
+        image["logo"] = pygame.transform.scale(image["logo"], (self.size * 0.9, self.size * 0.5))
         rect = image["logo"].get_rect(center=(self.screen_x/2, self.screen_y/4))
         screen.blit(image["logo"], rect)
         
@@ -353,7 +353,7 @@ class Connect4:
 def main():
     # pygame setup #
     pygame.init()
-    screen = pygame.display.set_mode((1000, 1000),pygame.RESIZABLE)
+    screen = pygame.display.set_mode((500, 500),pygame.RESIZABLE)
     clock = pygame.time.Clock()
     pygame.display.set_caption("Connect 4            -Andrew Roddy")
     
