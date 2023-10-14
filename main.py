@@ -24,7 +24,9 @@ class Connect4:
         self.running = True  # Checks if pygame is running
 
         # On Laptop screen.size = 649 fullscreen
+        # On Desktop screen.size = 1369 fullscreen
         self.size = 500  # The smallest screen dimension
+        self.center = 0  # The positive difference of y and x
         self.generate_text()  # Generates the text
         self.generate_image()  # Generates the images
 
@@ -38,7 +40,7 @@ class Connect4:
             self.screen_x,
             self.screen_y,
         ) = screen.get_size()  # Creates current screen size variables
-
+        
         if (
             past_x != self.screen_x or past_y != self.screen_y
         ):  # Checks if the screen size has changed
@@ -46,8 +48,14 @@ class Connect4:
                 self.size = self.screen_y
             else:
                 self.size = self.screen_x
+            
+            self.center = (
+                (self.size - self.screen_x) * (-0.385)
+                )
+            
             self.generate_text()  # Regenerates images and text using current size metrics
             self.generate_image()
+            self.text_coords = (self.screen_x / 2.15, self.size / 50)
 
     def player_turn(self, column: int) -> list:
         """Allows the player to place an icon on the board.
@@ -109,34 +117,34 @@ class Connect4:
             self.image["orange_chip"], (self.size * 0.1, self.size * 0.1)
         )
 
-        for i in range(len(self.board[0])):
-            screen.blit(
+        for i in range(len(self.board[0])):  # 0-6
+            number_x = (
+                self.center +
+                (self.size / 25) + # Adds to adjust for text
+                (i + self.size / 1500) # Same as chips
+                * (self.size / 7.5) 
+                )
+            screen.blit(  # Top Numbers
                 self.text[str(i + 1)],
-                (
-                    ((i + self.size / 1500) * (self.size / 7.5) + self.size / 22),
-                    self.size * 0.1,
-                ),
-            )
-            
-            screen.blit(
-                self.text[str(i + 1)],
-                (
-                    ((i + self.size / 1500) * (self.size / 7.5) + self.size / 22),
-                    ((5.7 + self.size / 1500) * (self.size / 7) + self.size * 0.1),
-                ),
+                (number_x, self.size * 0.15),
             )
 
-            for j in range(len(self.board)):
+            screen.blit(  # Bottom Numbers
+                self.text[str(i + 1)],
+                (number_x, (self.size - self.size * 0.06)),
+            )
+
+            x_coordinate = self.center + (i + self.size / 1500) * (self.size / 7.5)
+            for j in range(len(self.board)):  # 0-5
                 for k in range(len(icons)):
                     if self.board[j][i] == players[k]:
+                        y_coordinate = self.size / 5 + (j * self.size / 8)
+
                         screen.blit(
                             icons[k],
                             (
-                                ((i + self.size / 1500) * (self.size / 7.5)),
-                                (
-                                    (j + self.size / 1500) * (self.size / 7)
-                                    + self.size * 0.1
-                                ),
+                                x_coordinate,
+                                y_coordinate,
                             ),
                         )
 
@@ -177,7 +185,7 @@ class Connect4:
         # Instalizes all Text
         pygame.font.init()
 
-        font = pygame.font.Font(None, round(self.size/7))
+        font = pygame.font.Font(None, round(self.size / 7))
         text_dict = {
             "x_text": font.render("O", True, "orange"),
             "o_text": font.render("O", True, "blue"),
@@ -186,40 +194,10 @@ class Connect4:
             "game_tie": font.render("TIE", True, "black"),
         }
         font = pygame.font.Font(None, round(self.size * 0.06))
-
-        # Generates the numbers
-        text_dict["1"] = font.render(
-            "1",
-            True,
-            "black",
-        )
-        text_dict["2"] = font.render(
-            "2",
-            True,
-            "black",
-        )
-        text_dict["3"] = font.render(
-            "3",
-            True,
-            "black",
-        )
-        text_dict["4"] = font.render(
-            "4",
-            True,
-            "black",
-        )
-        text_dict["5"] = font.render(
-            "5",
-            True,
-            "black",
-        )
-        text_dict["6"] = font.render(
-            "6",
-            True,
-            "black",
-        )
-        text_dict["7"] = font.render(
-            "7",
+        
+        for i in range(1,8): # Generates the numbers
+            text_dict[str(i)] = font.render(
+            str(i),
             True,
             "black",
         )
@@ -240,6 +218,7 @@ class Connect4:
         return image_dict
 
     def main_menu(self, screen):
+        self.resize(screen)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -272,6 +251,7 @@ class Connect4:
         return True, screen
 
     def game_over(self, screen):
+        self.resize(screen)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -279,11 +259,11 @@ class Connect4:
             if event.type == pygame.QUIT:
                 self.running = False
         if self.winner == "X":
-            screen.blit(self.text["x_wins"], (200, 15))
+            screen.blit(self.text["x_wins"], self.text_coords)
         if self.winner == "O":
-            screen.blit(self.text["o_wins"], (200, 15))
+            screen.blit(self.text["o_wins"], self.text_coords)
         if self.winner == "Z":
-            screen.blit(self.text["game_tie"], ((200, 15)))
+            screen.blit(self.text["game_tie"], self.text_coords)
         return (
             False,
             screen,
@@ -329,11 +309,10 @@ def main():
             # Draws the pieces on the board
             screen.fill("aliceblue")
             screen = g.draw_board(screen)
-            player_coords = (g.size / 2.15, g.size / 50)
             if g.player == "X" and g.game_running:
-                screen.blit(g.text["x_text"], player_coords)
+                screen.blit(g.text["x_text"], g.text_coords)
             if g.player == "O" and g.game_running:
-                screen.blit(g.text["o_text"], player_coords)
+                screen.blit(g.text["o_text"], g.text_coords)
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
