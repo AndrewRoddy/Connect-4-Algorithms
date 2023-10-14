@@ -3,9 +3,9 @@ import pygame
 import random
 from check_board import *
 
+
 class Connect4:
     def __init__(self):
-        
         # Instalizes a blank board
         self.board = [
             ["_", "_", "_", "_", "_", "_", "_"],
@@ -15,31 +15,39 @@ class Connect4:
             ["_", "_", "_", "_", "_", "_", "_"],
             ["_", "_", "_", "_", "_", "_", "_"],
         ]  # Instalizes an empty board
-        self.player = "".join(random.choices(["X", "O"])) # Selectes a random starting player
-        self.game_running = True # Checks if the game is running
-        self.winner = "" # The winner of the game
-        self.mode = "pvp" # Current Gamemode
-        self.running = True # Checks if pygame is running
-        self.size = 500 # The smallest screen dimension
-        self.generate_text() # Generates the text
-        self.generate_image() # Generates the images
+        self.player = "".join(
+            random.choices(["X", "O"])
+        )  # Selectes a random starting player
+        self.game_running = True  # Checks if the game is running
+        self.winner = ""  # The winner of the game
+        self.mode = "pvp"  # Current Gamemode
+        self.running = True  # Checks if pygame is running
+
+        # On Laptop screen.size = 649 fullscreen
+        self.size = 500  # The smallest screen dimension
+        self.generate_text()  # Generates the text
+        self.generate_image()  # Generates the images
 
     def resize(self, screen):
-        try: # Creates a past screen size variable
+        try:  # Creates a past screen size variable
             past_x, past_y = self.screen_x, self.screen_y
         except AttributeError:
             past_x, past_y = 0, 0
-            
-        self.screen_x, self.screen_y = screen.get_size() # Creates current screen size variables
 
-        if past_x != self.screen_x or past_y != self.screen_y: # Checks if the screen size has changed
+        (
+            self.screen_x,
+            self.screen_y,
+        ) = screen.get_size()  # Creates current screen size variables
+
+        if (
+            past_x != self.screen_x or past_y != self.screen_y
+        ):  # Checks if the screen size has changed
             if self.screen_x > self.screen_y:
                 self.size = self.screen_y
             else:
                 self.size = self.screen_x
-            self.generate_text() # Regenerates images and text using current size metrics
+            self.generate_text()  # Regenerates images and text using current size metrics
             self.generate_image()
-
 
     def player_turn(self, column: int) -> list:
         """Allows the player to place an icon on the board.
@@ -100,7 +108,24 @@ class Connect4:
         self.image["orange_chip"] = pygame.transform.scale(
             self.image["orange_chip"], (self.size * 0.1, self.size * 0.1)
         )
+
         for i in range(len(self.board[0])):
+            screen.blit(
+                self.text[str(i + 1)],
+                (
+                    ((i + self.size / 1500) * (self.size / 7.5) + self.size / 22),
+                    self.size * 0.1,
+                ),
+            )
+            
+            screen.blit(
+                self.text[str(i + 1)],
+                (
+                    ((i + self.size / 1500) * (self.size / 7.5) + self.size / 22),
+                    ((5.7 + self.size / 1500) * (self.size / 7) + self.size * 0.1),
+                ),
+            )
+
             for j in range(len(self.board)):
                 for k in range(len(icons)):
                     if self.board[j][i] == players[k]:
@@ -114,7 +139,7 @@ class Connect4:
                                 ),
                             ),
                         )
-        screen = self.draw_text(screen, "numbers")
+
         return screen
 
     def colum_select(self, mode="pvp"):
@@ -152,7 +177,7 @@ class Connect4:
         # Instalizes all Text
         pygame.font.init()
 
-        font = pygame.font.Font(None, 74)
+        font = pygame.font.Font(None, round(self.size/7))
         text_dict = {
             "x_text": font.render("O", True, "orange"),
             "o_text": font.render("O", True, "blue"),
@@ -160,34 +185,48 @@ class Connect4:
             "o_wins": font.render("BLUE WINS", True, "blue"),
             "game_tie": font.render("TIE", True, "black"),
         }
+        font = pygame.font.Font(None, round(self.size * 0.06))
 
-        font = pygame.font.Font(None, 32)
-        text_dict["numbers"] = font.render(
-            "  1         2         3         4         5          6         7",
+        # Generates the numbers
+        text_dict["1"] = font.render(
+            "1",
             True,
             "black",
         )
+        text_dict["2"] = font.render(
+            "2",
+            True,
+            "black",
+        )
+        text_dict["3"] = font.render(
+            "3",
+            True,
+            "black",
+        )
+        text_dict["4"] = font.render(
+            "4",
+            True,
+            "black",
+        )
+        text_dict["5"] = font.render(
+            "5",
+            True,
+            "black",
+        )
+        text_dict["6"] = font.render(
+            "6",
+            True,
+            "black",
+        )
+        text_dict["7"] = font.render(
+            "7",
+            True,
+            "black",
+        )
+
+        # Generates the menu text
         text_dict["menu"] = font.render("Press Space To Begin", True, "black")
         self.text = text_dict
-
-    def draw_text(self, screen, key):
-        if key == "x_wins":
-            screen.blit(self.text["x_wins"], (200, 15))
-        if key == "o_wins":
-            screen.blit(self.text["o_wins"], (200, 15))
-        if key == "game_tie":
-            screen.blit(self.text["game_tie"], ((200, 15)))
-        if key == "x_text":
-            screen.blit(self.text["x_text"], (240, 20))
-        if key == "o_text":
-            screen.blit(self.text["o_text"], (240, 20))
-        if key == "numbers":
-            screen.blit(self.text["numbers"], (30, 50))
-            screen.blit(self.text["numbers"], (30, 480))
-        if key == "menu":
-            screen.blit(self.text["menu"], (240, 20))
-
-        return screen
 
     def generate_image(self):
         image_dict = {
@@ -240,11 +279,11 @@ class Connect4:
             if event.type == pygame.QUIT:
                 self.running = False
         if self.winner == "X":
-            self.draw_text(screen, "x_wins")
+            screen.blit(self.text["x_wins"], (200, 15))
         if self.winner == "O":
-            self.draw_text(screen, "o_wins")
+            screen.blit(self.text["o_wins"], (200, 15))
         if self.winner == "Z":
-            self.draw_text(screen, "game_tie")
+            screen.blit(self.text["game_tie"], ((200, 15)))
         return (
             False,
             screen,
@@ -290,10 +329,11 @@ def main():
             # Draws the pieces on the board
             screen.fill("aliceblue")
             screen = g.draw_board(screen)
+            player_coords = (g.size / 2.15, g.size / 50)
             if g.player == "X" and g.game_running:
-                screen = g.draw_text(screen, "x_text")
+                screen.blit(g.text["x_text"], player_coords)
             if g.player == "O" and g.game_running:
-                screen = g.draw_text(screen, "o_text")
+                screen.blit(g.text["o_text"], player_coords)
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
