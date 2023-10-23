@@ -3,7 +3,6 @@ import pygame
 import random
 from check_board import *
 
-
 class Connect4:
     def __init__(self):
         # Instalizes a blank board
