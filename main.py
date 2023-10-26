@@ -57,9 +57,6 @@ class Connect4:
             self.generate_text()  # Regenerates images and text using current size metrics
             self.generate_image()
             self.text_coords = (self.screen_x / 2.15, self.size / 50)
-            screen = self.refresh_screen(screen)
-            
-        return screen
 
     def player_turn(self, column: int) -> list:
         """Allows the player to place an icon on the board.
@@ -153,7 +150,7 @@ class Connect4:
                         )
 
 
-    def colum_select(self, screen, mode="pvp"):
+    def colum_select(self, mode="pvp"):
         # If a key is pressed then runs everything else
         keys = [
             pygame.K_1,
@@ -170,8 +167,7 @@ class Connect4:
                     for i in range(len(keys)):
                         if event.key == keys[i] and self.check_turn((i + 1)):
                             self.player_turn((i + 1))
-                            screen = self.refresh_screen(screen)
-                            return screen
+                            return True
 
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -186,19 +182,6 @@ class Connect4:
                     self.player_turn(pick)
                     self.refresh_screen()
                     break
-        
-        
-        return screen
-
-    def refresh_screen(self, screen):
-        screen.fill("aliceblue")
-        screen = self.draw_board(screen)
-        if self.player == "X" and self.game_running:
-            screen.blit(self.text["x_text"], self.text_coords)
-        if self.player == "O" and self.game_running:
-            screen.blit(self.text["o_text"], self.text_coords)
-            
-        return screen
 
     def generate_text(self):
         # Instalizes all Text
@@ -297,13 +280,13 @@ def main():
     ################
 
     g = Connect4()
-    #g.screen = screen
+
     mode = "pvp"
     # While the game is running
 
     menu = True
     while g.running:
-        screen = g.resize(screen)
+        g.resize(screen)
         if menu == True:
             g.screen.fill("aliceblue")
             menu = g.main_menu()
@@ -322,11 +305,14 @@ def main():
         else:
             # Draw from back to front
 
-            screen = g.colum_select(screen, mode)
-            
+            g.colum_select(mode)
             # Draws the pieces on the board
-            
-
+            screen.fill("aliceblue")
+            screen = g.draw_board(screen)
+            if g.player == "X" and g.game_running:
+                screen.blit(g.text["x_text"], g.text_coords)
+            if g.player == "O" and g.game_running:
+                screen.blit(g.text["o_text"], g.text_coords)
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
