@@ -277,7 +277,7 @@ def main():
     clock = pygame.time.Clock()
     pygame.display.set_caption("Column Clash by: Andrew Roddy")
 
-    ################
+    ##################
 
     g = Connect4()
 
