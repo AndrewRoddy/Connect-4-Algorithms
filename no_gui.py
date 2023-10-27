@@ -249,18 +249,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# TODO
 
-# Add pygame
-    # Add start screen
-    # Start by just showing a visual of the board
-
-# Seperate functions into different files
-
-# Add Bot Opponents
-    # Random
-    # Easy
-    # AI
-    # Add Difficulty
-# Make it so the user can choose their icon
-# Add Online Play
