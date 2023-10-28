@@ -2,7 +2,7 @@
 import pygame
 import random
 from check_board import *
-
+from algorithms import *
 
 class Connect4:
     def __init__(self):
@@ -174,17 +174,16 @@ class Connect4:
         Returns:
             list: The updated Connect 4 board.
         """
+
         column -= 1  # Changes from a visual column to a list column
 
         for i in range(len(self.board) - 1, -1, -1):
             if self.board[i][column] == "_":  # Checks if the column is empty
                 self.board[i][column] = self.player
                 break
-
         if check_win(self.board, self.player):  # Checks if the player has won
             self.winner = self.player
             self.game_running = False
-
         if check_full(self.board):  # Checks if the game ends in a tie
             self.game_running = False
             self.winner = "Z"
@@ -193,24 +192,6 @@ class Connect4:
             self.player = "O"
         else:
             self.player = "X"
-
-    def check_turn(self, column: int) -> bool:
-        """Checks if the player's turn is valid.
-
-        Args:
-            board (list): The current Connect 4 board.
-            column (int): The column that the user selected.
-
-        Returns:
-            bool: True if the turn is valid, False if the turn is invalid.
-        """
-        if column > 7 or column < 0:
-            return False
-
-        if self.board[0][column - 1] != "_":  # Checks if the column is full
-            return False
-
-        return True
 
     def colum_select(self):
         # If a key is pressed then runs everything else
@@ -227,7 +208,7 @@ class Connect4:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and self.game_running:
                     for i in range(len(keys)):
-                        if event.key == keys[i] and self.check_turn((i + 1)):
+                        if event.key == keys[i] and check_turn(self.board, (i + 1)):
                             self.player_turn((i + 1))
                             return True
 
@@ -235,11 +216,12 @@ class Connect4:
                     self.running = False
 
         if self.mode == "random" and self.player == "O":
-            while True:
-                pick = random.randint(1, 7)
-                if self.check_turn(pick):
-                    self.player_turn(pick)
-                    break
+            self.player_turn(random_algorithm(self.board))
+            return True
+                
+        if self.mode == "easy" and self.player == "O":
+            self.player_turn(easy_algorithm(self.board, self.player))
+            return True
 
         return False
 
@@ -253,7 +235,7 @@ class Connect4:
             ["E_key", pygame.K_e, "easy"],
             ["M_key", pygame.K_m, "medium"],
             ["H_key", pygame.K_h, "hard"],
-            ["A_key", pygame.K_a, "pvp"],
+            ["A_key", pygame.K_a, "ai"],
         ]
 
         for event in pygame.event.get():
@@ -336,6 +318,7 @@ def main():
                 screen = g.draw_board(screen)
 
         elif g.game_running == False:
+            screen = g.draw_board(screen)
             screen, g.game_running = g.game_over(screen)
 
             if g.game_running == True:
@@ -344,7 +327,6 @@ def main():
             if (
                 g.colum_select()
                 or frame_check >= 60
-                or (g.mode == "random" and g.player == "O")
             ):
                 screen.fill("aliceblue")  # Draw from back to front
                 screen = g.draw_board(screen)  # Draws the pieces on the board
