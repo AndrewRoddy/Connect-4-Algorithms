@@ -52,13 +52,13 @@ def easy_algorithm(board, player):
                 if board[focus[i][0]][focus[i][1] + j] == "_":
                     if focus[i][0] + 1 == (len(board) - 1):
                         if check_turn(board, ((focus[i][1] + j) + 1)):
-                            print("YAY IT WORKED")
-                            return (focus[i][1] + j)
+                            print(f"YESYES: {((focus[i][1] + j) + 1)}")
+                            return ((focus[i][1] + j) + 1)
                     try:
                         if board[focus[i][0] + 1][focus[i][1] + j] == "_":
                             if check_turn(board, ((focus[i][1] + j) + 1)):
-                                print("YAY IT WORKED")
-                                return (focus[i][1] + j)
+                                print(f"YESYES: {((focus[i][1] + j) + 1)}")
+                                return ((focus[i][1] + j) + 1)
                     except:
                         pass
 
