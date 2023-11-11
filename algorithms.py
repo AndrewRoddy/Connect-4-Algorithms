@@ -45,7 +45,6 @@ def easy_algorithm(board, player):
     focus = check_possible_rows(board, enemy)
 
     for i in range(len(focus)):
-        ic(i)
         for j in [-1, 3]:
             user_number = focus[i][1] + j
             if 0 >= user_number <= 6:
