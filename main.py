@@ -127,7 +127,7 @@ class Connect4:
         self.image["blue_chip"] = pygame.transform.scale(
             self.image["blue_chip"], (self.size * 0.1, self.size * 0.1)
         )
-        self.image["orange_chip"] = pygame.transform.scale(
+        self.image1["orange_chip"] = pygame.transform.scale(
             self.image["orange_chip"], (self.size * 0.1, self.size * 0.1)
         )
 

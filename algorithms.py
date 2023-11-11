@@ -43,25 +43,14 @@ def random_algorithm(board):
 def easy_algorithm(board, player):
     enemy = "O" if player == "X" else "X"
     focus = check_possible_rows(board, enemy)
-    print(focus)
-    for i in range(len(focus)):
-        for j in [-1, 3]:
-            if (j == -1 and focus[i][1] != 0) or (j == 3 and focus[i][1] != 4):
-                print(board[focus[i][0]][focus[i][1] + j])
-                print(focus[i][0], focus[i][1] + j)
-                if board[focus[i][0]][focus[i][1] + j] == "_":
-                    if focus[i][0] + 1 == (len(board) - 1):
-                        if check_turn(board, ((focus[i][1] + j) + 1)):
-                            print(f"YESYES: {((focus[i][1] + j) + 1)}")
-                            return ((focus[i][1] + j) + 1)
-                    try:
-                        if board[focus[i][0] + 1][focus[i][1] + j] == "_":
-                            if check_turn(board, ((focus[i][1] + j) + 1)):
-                                print(f"YESYES: {((focus[i][1] + j) + 1)}")
-                                return ((focus[i][1] + j) + 1)
-                    except:
-                        pass
 
+    for i in range(len(focus)):
+        ic(i)
+        for j in [-1, 3]:
+            user_number = focus[i][1] + j
+            if 0 >= user_number <= 6:
+                if board[focus[i][0]][focus[i][1] + j] == "_" and check_turn(board, (int(user_number) + 1)):
+                    return (int(user_number) + 1)
     return random_algorithm(board)
 
 
@@ -75,3 +64,15 @@ def hard_algorithm(board, player):
 
 def ai_algorithm(board, player):
     pass
+
+def display_board(board: list) -> None:
+    """Prints the board with column numbers to the terminal.
+
+    Args:
+        board (list): Prints the board to the terminal.
+    """
+    print("1 2 3 4 5 6 7")
+    for i in range(len(board)):  # Runs once for every row in the board
+        print(*board[i], sep=" ")
+
+    print("1 2 3 4 5 6 7")
